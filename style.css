@@ -1,0 +1,9 @@
+body { font-family: sans-serif; line-height: 1.5; max-width: 800px; margin: 0 auto; padding: 1rem; color: #333; }
+header { border-bottom: 2px solid #eee; margin-bottom: 2rem; }
+article { margin-bottom: 2rem; }
+article header { border: none; margin-bottom: 0.5rem; }
+h2 { margin: 0; font-size: 1.25rem; }
+a { text-decoration: none; color: #0077cc; }
+a:hover { text-decoration: underline; }
+small { color: #666; }
+img { max-width: 100%; height: auto; } /* Pour la meta-donnée contenu */
