@@ -1,1 +1,1 @@
-Coder une page web statique et sémantique et avec un minimum de classes (classless) un lecteur RSS incluant toutes les métadonnées (incluant le contenu) basé sur une liste OPML pour un serveur statique de type GitHub Page
+Coder une page web statique et sémantique et avec un minimum de classes (classless). La page sera un lecteur RSS incluant toutes les métadonnées (incluant le contenu) basé sur une liste OPML pour un serveur statique de type GitHub Page. Générer les fichiers index.html, .css, .js, .xml requis
