@@ -1,1 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecteur RSS Statique</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Lecteur RSS</h1>
+        <p>Basé sur OPML</p>
+    </header>
+    
+    <main id="app">
+        <p>Chargement des flux...</p>
+    </main>
 
+    <script>
+        const OPML_URL = 'feeds.opml';
+        const PROXY = 'https://allorigins.win'; // Contourne CORS
+
+        async function init() {
+            try {
+                const response = await fetch(OPML_URL);
+                const text = await response.text();
+                const parser = new DOMParser();
+                const opml = parser.parseFromString(text, "text/xml");
+                const outlines = opml.querySelectorAll('outline[xmlUrl]');
+                
+                let allItems = [];
+                for (let outline of outlines) {
+                    await fetchFeed(outline.getAttribute('xmlUrl'), outline.getAttribute('text'), allItems);
+                }
+                
+                // Trier par date (si dispo)
+                allItems.sort((a, b) => b.pubDate - a.pubDate);
+                render(allItems);
+            } catch (e) {
+                document.getElementById('app').innerHTML = "Erreur chargement OPML";
+            }
+        }
+
+        async function fetchFeed(url, title, allItems) {
+            try {
+                // Utilisation d'un proxy gratuit pour éviter les erreurs CORS
+                const response = await fetch(PROXY + encodeURIComponent(url));
+                const text = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, "text/xml");
+                
+                const items = doc.querySelectorAll('item, entry');
+                items.forEach(item => {
+                    allItems.push({
+                        feedTitle: title,
+                        title: item.querySelector('title').textContent,
+                        link: item.querySelector('link').getAttribute('href') || item.querySelector('link').textContent,
+                        date: item.querySelector('pubDate, updated').textContent,
+                        pubDate: new Date(item.querySelector('pubDate, updated').textContent),
+                        content: item.querySelector('description, content').textContent
+                    });
+                });
+            } catch (e) { console.error(url, e); }
+        }
+
+        function render(items) {
+            const app = document.getElementById('app');
+            app.innerHTML = items.map(item => `
+                <article>
+                    <header>
+                        <h2><a href="${item.link}" target="_blank">${item.title}</a></h2>
+                        <small>${item.feedTitle} - ${new Date(item.date).toLocaleDateString()}</small>
+                    </header>
+                    <div>${item.content}</div>
+                </article>
+            `).join('<hr>');
+        }
+
+        init();
+    </script>
+</body>
+</html>
